@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  List, ListItem, ListItemText, IconButton, Checkbox, Typography, Box, CircularProgress, Paper, Chip
+  List, ListItem, ListItemText, IconButton, Checkbox, Typography, Box, CircularProgress, Paper, Chip, Button
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -52,6 +52,19 @@ function TaskList({ onEdit }) {
       fetchTasks();
     } catch (err) {
       setError('Failed to update task');
+    }
+  };
+
+  const handlePriorityChange = async (task, newPriority) => {
+    try {
+      await fetch(`/api/tasks/${task.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priority: newPriority })
+      });
+      fetchTasks();
+    } catch (err) {
+      setError('Failed to update priority');
     }
   };
 
@@ -220,6 +233,34 @@ function TaskList({ onEdit }) {
                   }}
                 />
               )}
+              <Box display="flex" gap={0.5}>
+                {['P1', 'P2', 'P3'].map(p => (
+                  <Button
+                    key={p}
+                    variant="contained"
+                    size="small"
+                    aria-label={`Set priority ${p}`}
+                    onClick={() => handlePriorityChange(task, p)}
+                    sx={{
+                      minWidth: 36,
+                      height: 22,
+                      p: 0,
+                      fontSize: '0.65rem',
+                      fontWeight: 700,
+                      borderRadius: 1,
+                      bgcolor: task.priority === p ? '#07F2E6' : '#7A7A7A',
+                      color: '#fff',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        bgcolor: task.priority === p ? '#05d4ca' : '#5a5a5a',
+                        boxShadow: 'none',
+                      }
+                    }}
+                  >
+                    {p}
+                  </Button>
+                ))}
+              </Box>
               <Box 
                 sx={{ 
                   display: 'flex', 
